@@ -1,6 +1,18 @@
-import os, time
+# Crypto trading bot using binance api
+# Author: LeonardoM011<Leonardo.leo.201@gmail.com>
+# Created on 2021-02-05 21:56
+
+# Set constants here:
+DELTA_TIME = 300    # How long can we check for setting up new trade (in seconds)  
+# ----------------------
+
+import os
+import time
+import datetime
 import requests
 from binance.client import Client
+
+
 
 def find_index_of(key, value, list):
     return next((i for i, item in enumerate(list) if item[key] == value), None)
@@ -32,6 +44,11 @@ def main():
         return -1
     print("Successfully connected to binance with api key.")
 
+    while True:
+
+
+        time.sleep(60)
+    # datetime.datetime.now().year
     #btcusdt_price = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
     #if (btcusdt_price.status_code != 200):
     #    print("Error connecting to api server to get price")
