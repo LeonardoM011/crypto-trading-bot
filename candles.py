@@ -4,7 +4,7 @@
 # Source: tradingview.com
 import math
 
-def convertCandles(candles, num):
+def convert_candles(candles, num):
     list = []
     for item in candles[:-5:-1]:
         list.append(float(item[num]))
@@ -14,17 +14,17 @@ def convertCandles(candles, num):
     return list
 
 
-def getCandleInfo(candles, doji_size=0.05):
+def get_candle_info(candles, doji_size=0.05):
     # TODO: replace open with open[0] and others
     info = []
     doji_size = float(max(0.01, doji_size))
     #study(title = "Candles", overlay = true)
     #DojiSize = input(0.05, minval=0.01, title="Doji size")
 
-    open = convertCandles(candles, 1)
-    high = convertCandles(candles, 2)
-    low = convertCandles(candles, 3)
-    close = convertCandles(candles, 4)
+    open = convert_candles(candles, 1)
+    high = convert_candles(candles, 2)
+    low = convert_candles(candles, 3)
+    close = convert_candles(candles, 4)
 
     if abs(open[0] - close[0]) <= (high[0] - low[0]) * doji_size:
         info.append({ 'name': 'Doji', 'color': 'white', 'trend': 'neutral' })
@@ -109,4 +109,11 @@ def getCandleInfo(candles, doji_size=0.05):
     #data15=((close[1]>open[1])and(((close[1]+open[1])/2)>close)and(open>close)and(open>close[1])and(close>open[1])and((open-close)/(.001+(high-low))>0.6))
     #plotshape(data15, title= "Dark Cloud Cover", color=red, style=shape.arrowdown, text="Dark\nCloudCover")
     
+    # Additional candlesticks
+    if open[0] > close[0] and open[1] > close[1] and open[2] > close[2]:
+        info.append({ 'name': 'Three Black Crows', 'color': 'red', 'trend': 'downwards' })
+    
+    if close[0] > open[0] and close[1] > open[1] and close[2] > open[2]:
+        info.append({ 'name': 'Three White Soldiers', 'color': 'lime', 'trend': 'upwards' })
+
     return info

@@ -6,18 +6,27 @@
 DELTA_TIME = 300    # How long can we check for setting up new trade (in seconds)  
 # ----------------------
 
+# Imports:
 import os
 import time
 import datetime
 import requests
-from binance.client import Client
+from deps.binance.binance.client import Client
 
+# Globals:
+client = None
 
-
+# Finds index of key that equals value inside of list
 def find_index_of(key, value, list):
     return next((i for i, item in enumerate(list) if item[key] == value), None)
 
-def main():
+# Returns True if successful and False if not
+def check_connectivity():
+    if (client.get_system_status()['status'] != 0 and client.get_system_status()['msg'] != 'normal'):
+        return False
+    return True
+
+def get_api_keys():
     api_key = input("Enter BINANCE API KEY (press enter to fetch from env var): ")
     if not api_key:
         print("Trying to fetch from env variable ($BINANCE_API_KEY)...")
@@ -35,19 +44,37 @@ def main():
             print("Unable to fetch API SECRET KEY!")
             return -1
         print("API SECRET KEY successfully fetched.")
+    return api_key, api_secret
+
+# Main program loop
+def start():
+    close_trade_hour = -1
+    open_trade = False
+    try:
+        while True:
+            hour = datetime.datetime.now().hour
+            minute = datetime.datetime.now().minute
+            if not open_trade and close_trade_hour != hour and minute < 10:
+                print("Initiating trade...")
+            time.sleep(300)
+    except KeyboardInterrupt:
+        print('Program canceled...')
+
+def main():
+    print("Starting kobe trading bot....")
+    api_key, api_secret = get_api_keys()
     
     print("Connecting to binance...")
+    global client 
     client = Client(api_key, api_secret)
 
-    if (client.get_system_status()['status'] != 0 and client.get_system_status()['msg'] != 'normal'):
-        print("Error connecting to binance!")
+    if not check_connectivity():
+        print("There has been an error connecting to binance with api key.")
         return -1
     print("Successfully connected to binance with api key.")
 
-    while True:
+    
 
-
-        time.sleep(60)
     # datetime.datetime.now().year
     #btcusdt_price = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
     #if (btcusdt_price.status_code != 200):
