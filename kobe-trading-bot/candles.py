@@ -7,13 +7,15 @@ import math
 sys.path.insert(1, "../deps/binance")
 from binance.client import Client
 
+from fun import *
+
 def convert_candles(candles, num):
     list = []
     for item in candles[:-5:-1]:
         list.append(float(item[num]))
     if not list:
-        print("Error: List is empty (candles.py)")
-        return
+        output.print_failed("List is empty.")
+        assert False
     return list
 
 def flip_side(side):

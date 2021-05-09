@@ -14,14 +14,12 @@ import sys
 import time as t
 import datetime
 
-import candles as can
 # Adding python-binance to path and importing python-binance
 sys.path.insert(1, "../deps/binance")
 from binance.client import Client
-from binance.exceptions import BinanceRequestException
-from binance.exceptions import BinanceAPIException
 
 from fun import *
+import candles as can
 
 # Globals:
 client = None
@@ -41,7 +39,7 @@ def start():
                     info = can.get_candle_info(candles[:-1])
                     candle_side = can.get_side(info)
                     if candle_side:
-                        print_info('Initiating trade...')
+                        output.print_info('Initiating trade...')
                         #current_price = client.futures_mark_price(symbol="BTCUSDT", contractType="PERPETUAL")['markPrice']
                         close_price = candles
                         client.futures_create_order(symbol="BTCUSDT", side=candle_side, type=Client.ORDER_TYPE_MARKET, quantity=0.001)
@@ -53,19 +51,28 @@ def start():
     except KeyboardInterrupt:
         print('Program canceled...')
 
+def connect():
+    while True:
+        api_key = get_api_key("BINANCE_API_KEY")
+        api_secret = get_api_key("BINANCE_API_SECRET_KEY")
+        
+        output.print_info('Connecting to binance...')
+        global client 
+        client = Client(api_key, api_secret)
+
+        if check_connectivity(client):
+            output.print_ok('Successfully connected to binance.')
+
+        if check_account_status(client):
+            output.print_ok('Successfully connected using api keys.')
+            return
+
+        output.print_failed('Cannot connect to binance with api keys.')
+
 def main():
-    print_ok('Starting kobe trading bot...')
-    api_key, api_secret = get_api_keys()
+    output.print_ok('Starting kobe trading bot...')
     
-    print_info('Connecting to binance...')
-    global client 
-    client = Client(api_key, api_secret)
-
-    if not check_connectivity(client):
-        print_failed('There has been an error connecting to binance with api key.')
-        return -1
-    print_ok('Successfully connected to binance with api key.')
-
+    connect()
     start()
 
     #try:
